@@ -1,12 +1,12 @@
 <p align="center">
-  <a href="http://ned.im/noty?ref=readme">
-    <img src="http://ned.im/noty/img/projects/noty-v3-logo.png" width=200 height=70>
+  <a href="https://ned.im/noty?ref=readme">
+    <img src="https://ned.im/noty/_media/noty-v3-logo.png" width=200 height=70>
   </a>
 
   <p align="center">
     Dependency-free notification library.
     <br>
-    <a href="http://ned.im/noty"><strong>Documentation &raquo;</strong></a>
+    <a href="https://ned.im/noty"><strong>Documentation &raquo;</strong></a>
   </p>
 
   <p align="center">
@@ -14,6 +14,7 @@
     <a href="https://bower.io/"><img src="https://img.shields.io/bower/v/noty.svg" alt="Bower version"></a>
     <a href="https://www.npmjs.com/package/noty"><img src="https://img.shields.io/npm/v/noty.svg" alt="NPM version"></a>
     <a href="https://packagist.org/packages/needim/noty"><img src="https://img.shields.io/packagist/v/needim/noty.svg" alt="Packagist version"></a>
+    <a href="https://cdnjs.com/libraries/noty"><img src="https://img.shields.io/cdnjs/v/noty.svg" alt="CDNJS version"></a>
     <br>
     <img src="https://img.shields.io/david/needim/noty.svg" alt="Dependencies">
     <img src="https://img.shields.io/david/dev/needim/noty.svg" alt="Dev Dependencies">
@@ -26,7 +27,6 @@
 
 <br>
 
-
 ## Hi
 
 **NOTY** is a notification library that makes it easy to create **alert** - **success** - **error** - **warning** - **information** - **confirmation** messages as an alternative the standard alert dialog.
@@ -38,8 +38,47 @@ There are lots of other options in the API to customise the text, animation, but
 
 It also has various callbacks for the buttons, opening closing the notifications and queue control.
 
-***
+### Sponsored By
+
+<table>
+  <tr>
+    <td vlign="center">
+      <a target="_blank" href="https://infatica.io/">
+        <img src="https://infatica.io/templates/digit-whm-white/images/Logo-black.svg" width="220" alt="">
+      </a>
+    </td>
+    <td vlign="center">
+      <a target="_blank" href="https://www.jetbrains.com?ref=notyjs">
+        <img src="https://ned.im/noty/_media/logo_JetBrains_4.svg" width="80" alt="">
+      </a>
+    </td>
+    <td vlign="center">
+      <a target="_blank" href="https://www.browserstack.com?ref=notyjs">
+        <img src="https://ned.im/noty/_media/browserstack.svg" width="220" alt="">
+      </a>
+    </td>
+    <td vlign="center">
+      <a target="_blank" href="https://www.norgescasino.com/">
+        <img src="https://ned.im/noty/_media/norges.png" width="235" alt="" style="background: #13092B; padding: 5px;">
+      </a>
+    </td>
+    <td vlign="center">
+      <a target="_blank" href="https://www.bonus.ca/fr/">
+        <img src="https://ned.im/noty/_media/bonusfinder.png" width="150" alt="">
+      </a>
+    </td>
+    <td vlign="center">
+      <a target="_blank" href="https://www.boostmmr.com/">
+        <img src="https://i.ibb.co/99682Vb/boostmmr.jpg" width="220" alt="">
+      </a>
+    </td>
+  </tr>
+</table>
+
+---
+
 ### Features
+
 - [x] Dependency-free
 - [x] Web Push Notifications with Service Worker support
 - [x] UMD
@@ -56,43 +95,49 @@ It also has various callbacks for the buttons, opening closing the notifications
 - [x] Document visibility control (blur, focus)
 
 ### Documentation
+
 Documentation and examples are here: <http://ned.im/noty>
 
-***
+---
 
 ##### Basic Usage
+
 ```js
-import Noty from 'noty';
+import Noty from "noty";
 
 new Noty({
-    text: 'Notification text'
+  text: "Notification text"
 }).show();
 
 // or
 
-const Noty = require('noty');
+const Noty = require("noty");
 
 new Noty({
-    text: 'Notification text'
+  text: "Notification text"
 }).show();
-
 ```
 
 ##### Development
+
 ```console
 $ npm run dev
 $ npm test
 $ npm run build
+$ npm run browserstack
+$ npm run serve-docs
 ```
 
 ##### Development environment
+
 - [x] Standard
+- [x] Prettier
 - [x] ES6 & Babel & Webpack
 - [x] Sass
 - [x] Autoprefixer
-- [x] AVA
+- [x] QUnit
+- [x] BrowserStack
 - [x] Pre-commit tests
 - [x] Travis CI
-
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)

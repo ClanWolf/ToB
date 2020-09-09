@@ -17,7 +17,7 @@ use SlaxWeb\Database\Query\Where\Predicate;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 class BuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +32,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder = new Builder;
         // statically set delimiter and table name for all test
-        $this->builder->setDelim("\"")->table("foos");
+        $this->builder->setDelim("\"\"")->table("foos");
     }
 
     protected function tearDown()
@@ -141,16 +141,17 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     public function testWhereGroupping()
     {
         $this->assertEquals(
-            "SELECT \"foos\".\"foo\" FROM \"foos\" WHERE 1=1 AND (\"foos\".\"bar\" = ? "
-            . "  AND (\"foos\".\"bar\" < ? OR \"foos\".\"baz\" > ?))",
+            "SELECT \"foos\".\"foo\" FROM \"foos\" WHERE 1=1 AND "
+            . "(\"foos\".\"bar\" < ? OR \"foos\".\"baz\" > ?) "
+            . "AND \"foos\".\"bar\" = ?",
             $this->builder
-                ->where("bar", "baz")
                 ->groupWhere(function ($builder) {
                     $builder->where("bar", 10, Predicate::OPR_LESS)
                         ->orWhere("baz", 1, Predicate::OPR_GRTR);
-                })->select(["foo"])
+                })->where("bar", "baz")
+                ->select(["foo"])
         );
-        $this->assertEquals(["baz", 10, 1], $this->builder->getParams());
+        $this->assertEquals([10, 1, "baz"], $this->builder->getParams());
 
         $this->builder->reset();
         $this->assertEquals(
@@ -176,14 +177,15 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     public function testNestedWhere()
     {
         $this->assertEquals(
-            "SELECT \"foos\".\"foo\" FROM \"foos\" WHERE 1=1 AND (\"foos\".\"bar\" = ? "
-            . "AND \"foos\".\"bar\" IN (SELECT \"bars\".\"bar\" FROM \"bars\" WHERE 1=1))",
+            "SELECT \"foos\".\"foo\" FROM \"foos\" WHERE 1=1 AND ("
+            . "\"foos\".\"bar\" IN (SELECT \"bars\".\"bar\" FROM \"bars\" WHERE 1=1) "
+            . "AND \"foos\".\"bar\" = ?)",
             $this->builder
-                ->where("bar", "baz")
                 ->nestedWhere("bar", function ($builder) {
                     return $builder->table("bars")
                         ->select(["bar"]);
-                })->select(["foo"])
+                })->where("bar", "baz")
+                ->select(["foo"])
         );
         $this->assertEquals(["baz"], $this->builder->getParams());
 

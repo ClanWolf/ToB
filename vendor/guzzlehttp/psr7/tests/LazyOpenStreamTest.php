@@ -3,13 +3,13 @@ namespace GuzzleHttp\Tests\Psr7;
 
 use GuzzleHttp\Psr7\LazyOpenStream;
 
-class LazyOpenStreamTest extends \PHPUnit_Framework_TestCase
+class LazyOpenStreamTest extends BaseTest
 {
     private $fname;
 
     protected function setUp()
     {
-        $this->fname = tempnam('/tmp', 'tfile');
+        $this->fname = tempnam(sys_get_temp_dir(), 'tfile');
 
         if (file_exists($this->fname)) {
             unlink($this->fname);

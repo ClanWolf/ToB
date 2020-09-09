@@ -2,7 +2,24 @@
 
 Changes between version.
 
-## Current changes
+## v0.6
+
+### v0.6.3
+
+* properly check if row data is set and is an object when attempting to retrieve
+data from it
+* properly check if the column is set in the current row when attempting to retrieve
+data
+
+### v0.6.2
+
+* fix error generation bug if PDO error does not provide a valid error message
+
+### v0.6.1
+
+* fix bug in exception namespace names in the Result class
+
+### v0.6.0
 
 * set connection timeout when instantiating PDO
 * remove query builder from the pdo sub-component

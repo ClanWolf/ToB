@@ -10,7 +10,7 @@
     ],
     "require": {
         "php":  ">=7.0.0",
-        "monolog/monolog": "~1.17"
+        "monolog/monolog": "~1.22.0"
     },
     "suggest": {
         "pimple/pimple": "Make use of available providers for Pimple version 3.0.x",
@@ -23,7 +23,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.5.x-dev"
+            "dev-master": "0.6.x-dev"
         }
     }
 }

@@ -16,7 +16,7 @@ use SlaxWeb\Router\Response;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 class Dispatcher
 {
@@ -117,7 +117,7 @@ class Dispatcher
         $method = $request->getMethod();
         $requestMethod = constant("\\SlaxWeb\\Router\\Route::METHOD_"
             . $method);
-        $requestUri = trim($request->getPathInfo(), "/");
+        $requestUri = ltrim($request->getPathInfo(), "/");
 
         $this->logger->info(
             "Trying to find match for ({$method}) '{$requestUri}'"

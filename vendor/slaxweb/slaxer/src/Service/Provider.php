@@ -10,7 +10,7 @@
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.1
+ * @version   0.3
  */
 namespace SlaxWeb\Slaxer\Service;
 
@@ -25,39 +25,40 @@ class Provider implements \Pimple\ServiceProviderInterface
      *
      * Register is called by the container, when the provider gets registered.
      *
-     * @param \Pimple\Container $container Dependency Injection Container
+     * @param \Pimple\Container $app Dependency Injection Container
      * @return void
-     *
-     * @todo load the Install Package Command
      */
-    public function register(Container $container)
+    public function register(Container $app)
     {
-        $container["slaxer.service"] = function (Container $cont) {
-            $app = new CLIApp("Slaxer", "0.3.0");
+        $app["slaxer.service"] = function (Container $app) {
+            $cliApp = new CLIApp("Slaxer", "0.4.*-dev");
 
-            $installCommand = new InstallCommand;
-            $installCommand->init($cont, new \GuzzleHttp\Client);
-            $app->add($installCommand);
-
-            if (isset($cont["slaxerCommands"]) === false) {
-                return $app;
+            if (isset($app["slaxerCommands"]) === false) {
+                return $cliApp;
             }
 
-            foreach ($cont["slaxerCommands"] as $key => $value) {
+            foreach ($app["slaxerCommands"] as $key => $value) {
                 $params = [];
                 if (is_int($key)) {
                     $command = $value;
                 } else {
                     $command = $key;
-                    $params = $value;
+                    if (is_string($value)) {
+                        $value = [$value];
+                    }
+                    foreach ($value as $service) {
+                        $params[] = $app[$service];
+                    }
                 }
 
-                $cmd = new $command;
-                $cmd->init($cont, ...$params);
-                $app->add($cmd);
+                $cmd = new $command($app["logger.service"]("Slaxer"));
+                if (method_exists($cmd, "init")) {
+                    $cmd->init(...$params);
+                }
+                $cliApp->add($cmd);
             }
 
-            return $app;
+            return $cliApp;
         };
     }
 }

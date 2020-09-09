@@ -226,7 +226,9 @@ export function visibilityChangeFlow () {
       function () {
         Object.keys(API.Store).forEach(id => {
           if (API.Store.hasOwnProperty(id)) {
-            API.Store[id].stop()
+            if (API.Store[id].options.visibilityControl) {
+              API.Store[id].stop()
+            }
           }
         })
       },
@@ -239,7 +241,9 @@ export function visibilityChangeFlow () {
       function () {
         Object.keys(API.Store).forEach(id => {
           if (API.Store.hasOwnProperty(id)) {
-            API.Store[id].resume()
+            if (API.Store[id].options.visibilityControl) {
+              API.Store[id].resume()
+            }
           }
         })
         API.queueRenderAll()
@@ -248,7 +252,10 @@ export function visibilityChangeFlow () {
     )
   }
 
-  addListener(document, visibilityChange, onVisibilityChange)
+  if (visibilityChange) {
+    addListener(document, visibilityChange, onVisibilityChange)
+  }
+
   addListener(window, 'blur', onBlur)
   addListener(window, 'focus', onFocus)
 }

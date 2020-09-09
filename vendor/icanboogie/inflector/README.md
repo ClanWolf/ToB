@@ -2,7 +2,6 @@
 
 [![Release](https://img.shields.io/packagist/v/ICanBoogie/Inflector.svg)](https://packagist.org/packages/icanboogie/inflector)
 [![Build Status](https://img.shields.io/travis/ICanBoogie/Inflector/master.svg)](http://travis-ci.org/ICanBoogie/Inflector)
-[![HHVM](https://img.shields.io/hhvm/icanboogie/inflector.svg)](http://hhvm.h4cc.de/package/icanboogie/inflector)
 [![Code Quality](https://img.shields.io/scrutinizer/g/ICanBoogie/Inflector/master.svg)](https://scrutinizer-ci.com/g/ICanBoogie/Inflector)
 [![Code Coverage](https://img.shields.io/coveralls/ICanBoogie/Inflector/master.svg)](https://coveralls.io/r/ICanBoogie/Inflector)
 [![Packagist](https://img.shields.io/packagist/dm/icanboogie/inflector.svg?maxAge=2592000)](https://packagist.org/packages/icanboogie/inflector)
@@ -73,6 +72,10 @@ $inflector->camelize('active_model/errors', Inflector::DOWNCASE_FIRST_LETTER);
 
 $inflector->underscore('ActiveModel');               // 'active_model'
 $inflector->underscore('ActiveModel\Errors');        // 'active_model/errors'
+$inflector->underscore('Less Active Phrase');        // 'less_active_phrase'
+$inflector->underscore('Number 1 Test');             // 'number_1_test'
+$inflector->underscore('Johnny5 Still Alive');       // 'johnny5_still_alive'
+$inflector->underscore('Lots   of   Spaces');        // 'lots_of_spaces'
 
 # humanize
 
@@ -103,6 +106,12 @@ $inflector->ordinalize(1002);                        // "1002nd"
 $inflector->ordinalize(1003);                        // "1003rd"
 $inflector->ordinalize(-11);                         // "-11th"
 $inflector->ordinalize(-1021);                       // "-1021st"
+
+# uncountable
+
+$inflector->is_uncountable("advice");                // true
+$inflector->is_uncountable("weather");               // true
+$inflector->is_uncountable("cat");                   // false
 ```
 
 Helpers makes it easy to use default locale inflections.

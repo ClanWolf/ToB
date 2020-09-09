@@ -326,7 +326,7 @@ As described earlier, you can get the body of a response using the
 
 .. code-block:: php
 
-    $body = $response->getBody()) {
+    $body = $response->getBody();
     echo $body;
     // Cast to a string: { ... }
     $body->seek(0);
@@ -451,5 +451,6 @@ functionality.
 - `InflateStream <https://github.com/guzzle/psr7#inflatestream>`_
 - `LazyOpenStream <https://github.com/guzzle/psr7#lazyopenstream>`_
 - `LimitStream <https://github.com/guzzle/psr7#limitstream>`_
+- `MultipartStream <https://github.com/guzzle/psr7#multipartstream>`_
 - `NoSeekStream <https://github.com/guzzle/psr7#noseekstream>`_
 - `PumpStream <https://github.com/guzzle/psr7#pumpstream>`_

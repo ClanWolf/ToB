@@ -17,7 +17,7 @@ use SlaxWeb\Database\Query\Where\Predicate;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 class GroupTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,15 +31,16 @@ class GroupTest extends \PHPUnit_Framework_TestCase
     public function testConvert()
     {
         $group = new Group;
-        $group->setDelim("\"");
+        $group->setDelim("\"\"");
         $group->table("\"foos\"");
         $group->where("foo", "bar");
         $group->where("baz", "qux");
 
         $this->assertEquals(" AND (\"foos\".\"foo\" = ? AND \"foos\".\"baz\" = ?)", $group->convert());
+        $this->assertEquals(" AND (\"foos\".\"foo\" = ? AND \"foos\".\"baz\" = ?)", $group->convert());
 
         $group = new Group("OR");
-        $group->setDelim("\"");
+        $group->setDelim("\"\"");
         $group->table("\"foos\"");
         $group->where("foo", "bar");
         $group->where("baz", "qux");

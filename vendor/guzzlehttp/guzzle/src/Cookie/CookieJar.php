@@ -94,15 +94,17 @@ class CookieJar implements CookieJarInterface
      */
     public function getCookieByName($name)
     {
-        // don't allow a null name
-        if($name === null) {
+        // don't allow a non string name
+        if ($name === null || !is_scalar($name)) {
             return null;
         }
-        foreach($this->cookies as $cookie) {
-            if($cookie->getName() !== null && strcasecmp($cookie->getName(), $name) === 0) {
+        foreach ($this->cookies as $cookie) {
+            if ($cookie->getName() !== null && strcasecmp($cookie->getName(), $name) === 0) {
                 return $cookie;
             }
         }
+
+        return null;
     }
 
     public function toArray()
@@ -120,7 +122,7 @@ class CookieJar implements CookieJarInterface
         } elseif (!$path) {
             $this->cookies = array_filter(
                 $this->cookies,
-                function (SetCookie $cookie) use ($path, $domain) {
+                function (SetCookie $cookie) use ($domain) {
                     return !$cookie->matchesDomain($domain);
                 }
             );
@@ -235,9 +237,39 @@ class CookieJar implements CookieJarInterface
                 if (!$sc->getDomain()) {
                     $sc->setDomain($request->getUri()->getHost());
                 }
+                if (0 !== strpos($sc->getPath(), '/')) {
+                    $sc->setPath($this->getCookiePathFromRequest($request));
+                }
                 $this->setCookie($sc);
             }
         }
+    }
+
+    /**
+     * Computes cookie path following RFC 6265 section 5.1.4
+     *
+     * @link https://tools.ietf.org/html/rfc6265#section-5.1.4
+     *
+     * @param RequestInterface $request
+     * @return string
+     */
+    private function getCookiePathFromRequest(RequestInterface $request)
+    {
+        $uriPath = $request->getUri()->getPath();
+        if (''  === $uriPath) {
+            return '/';
+        }
+        if (0 !== strpos($uriPath, '/')) {
+            return '/';
+        }
+        if ('/' === $uriPath) {
+            return '/';
+        }
+        if (0 === $lastSlashPos = strrpos($uriPath, '/')) {
+            return '/';
+        }
+
+        return substr($uriPath, 0, $lastSlashPos);
     }
 
     public function withCookieHeader(RequestInterface $request)

@@ -9,7 +9,7 @@
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 namespace SlaxWeb\View\Service;
 
@@ -58,7 +58,7 @@ class Provider implements \Pimple\ServiceProviderInterface
 
                 if (method_exists($view, "init")) {
                     $args = func_get_args();
-                    array_slice($args, 2);
+                    $args = array_slice($args, 2);
                     $view->init(...$args);
                 }
 

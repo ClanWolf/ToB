@@ -4,6 +4,13 @@ Changes between version.
 
 ## Current changes
 
+* add guzzlehttp client as a service definition to service provider
+* add install component command to 'slaxerCommands' application property
+
+## v0.6
+
+### v0.6.0
+
 * add service provider for config component
 * add service provider for hooks component
 * add service provider for logger component
@@ -21,6 +28,7 @@ it
 to help improve performance
 * add component command
 * download and install composer if not found in PATH
+* fix component installation command for specific versions
 
 ## v0.5
 

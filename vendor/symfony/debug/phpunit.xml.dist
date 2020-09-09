@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.2/phpunit.xsd"
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
@@ -14,10 +14,7 @@
 
     <testsuites>
         <testsuite name="Symfony Debug Component Test Suite">
-            <directory>./Tests/</directory>
-        </testsuite>
-        <testsuite name="Symfony Debug Extension Test Suite">
-            <directory suffix=".phpt">./Resources/ext/tests/</directory>
+            <directory suffix=".phpt">./Tests/</directory>
         </testsuite>
     </testsuites>
 

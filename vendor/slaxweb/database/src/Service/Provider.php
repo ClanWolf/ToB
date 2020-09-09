@@ -10,7 +10,7 @@
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 namespace SlaxWeb\Database\Service;
 
@@ -43,6 +43,21 @@ class Provider implements \Pimple\ServiceProviderInterface
 
         $container["loadDBModel.service"] = $container->protect(
             function(string $model) use ($container) {
+                $container["__loadingModelName"] = $model;
+                $container["__loadingModelParams"] = func_get_args();
+                $model = $container["dbModelLoader.service"];
+                unset($container["__loadingModelName"], $container["__loadingModelParams"]);
+                return $model;
+            }
+        );
+
+        $container["dbModelLoader.service"] = $container->factory(
+            function($container) {
+                $model = $container["__loadingModelName"] ?? "";
+                if ($model === "") {
+                    throw new \SlaxWeb\Database\Exception\NoModelNameException;
+                }
+
                 $cacheName = "loadDBModel.service-{$model}";
                 if (isset($container[$cacheName])) {
                     return $container[$cacheName];
@@ -60,7 +75,7 @@ class Provider implements \Pimple\ServiceProviderInterface
                 );
 
                 if (method_exists($model, "init")) {
-                    $args = func_get_args();
+                    $args = $container["__loadingModelParams"];
                     array_shift($args);
                     $model->init(...$args);
                 }
@@ -69,8 +84,8 @@ class Provider implements \Pimple\ServiceProviderInterface
             }
         );
 
-        $container["queryBuilder.service"] = function() {
+        $container["queryBuilder.service"] = $container->factory(function() {
             return new \SlaxWeb\Database\Query\Builder;
-        };
+        });
     }
 }

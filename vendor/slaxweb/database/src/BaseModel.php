@@ -12,7 +12,7 @@
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 namespace SlaxWeb\Database;
 
@@ -66,6 +66,13 @@ abstract class BaseModel
      * @var string
      */
     public $table = "";
+
+    /**
+     * Object name delimiter
+     *
+     * @var string
+     */
+    protected $delim = "";
 
     /**
      * Primary Key Column
@@ -205,7 +212,7 @@ abstract class BaseModel
         $this->qBuilder = $queryBuilder;
         $this->db = $db;
         $this->hooks = $hooks;
-        
+
         $this->invokeHook("init");
 
         if ($this->table === "" && $this->config["database.autoTable"]) {
@@ -213,10 +220,32 @@ abstract class BaseModel
         }
         $this->setSoftDelete();
         $this->setTimestampConfig();
+        $this->setDelimiter();
 
         $this->logger->info("Model initialized successfuly", ["model" => get_class($this)]);
 
         $this->invokeHook("init", self::HOOK_AFTER);
+    }
+
+    /**
+     * Set Delim
+     *
+     * Sets the protected delimiter.
+     *
+     * WARNING: this method exists only for the unit tests. Calling it outside of
+     * the unit tests will have no effect in the query builder. This method is therefor
+     * directly deprecated.
+     *
+     * @param string $delim Delimiter character
+     * @return self
+     *
+     * @deprecated 0.7 The method has only been added to simplify the unit test
+     * and will be removed once phpunit is swapped for Mockery.
+     */
+    public function setDelim(string $delim): self
+    {
+        $this->delim = strlen($delim) > 1 ? $delim : $delim . $delim;
+        return $this;
     }
 
     /**
@@ -388,7 +417,7 @@ abstract class BaseModel
      * object as its input parameter. Additional where predicates must be added
      * to the builder through this object.
      *
-     * @param Closure $predicates Grouped predicates definition closure
+     * @param \Closure $predicates Grouped predicates definition closure
      * @return self
      */
     public function groupWhere(\Closure $predicates): self
@@ -403,7 +432,7 @@ abstract class BaseModel
      * Works the same way as 'Grouped Where predicates' method, except it adds the
      * predicate group to the list with the "OR" comparison operator.
      *
-     * @param Closure $predicates Grouped predicates definition closure
+     * @param \Closure $predicates Grouped predicates definition closure
      * @return self
      */
     public function orGroupWhere(\Closure $predicates): self
@@ -418,7 +447,7 @@ abstract class BaseModel
      * Add a nested select as a value to the where predicate.
      *
      * @param string $column Column name
-     * @param closure $nested Nested builder
+     * @param \Closure $nested Nested builder
      * @param string $lOpr Logical operator, default string("IN")
      * @return self
      */
@@ -438,7 +467,7 @@ abstract class BaseModel
      * select predicate with an "OR" comparisson operator instead of an "AND".
      *
      * @param string $column Column name
-     * @param closure $nested Nested builder
+     * @param \Closure $nested Nested builder
      * @param string $lOpr Logical operator, default string("IN")
      * @return self
      */
@@ -672,6 +701,41 @@ abstract class BaseModel
                 $this->table = strtolower($this->table);
                 break;
         }
+    }
+
+    /**
+     * Set delimiter
+     *
+     * Sets the object name delimiter to the query builder and the protected property.
+     * If the 'delim' proected property is set then it is going to be used. The
+     * second location to check for a configured delimiter is in the 'delimiterOverride'
+     * configuration setting. If none are set, the default delimiter for the driver
+     * is set.
+     *
+     * @return void
+     */
+    protected function setDelimiter()
+    {
+        if ($this->delim === "") {
+            if ($this->config["database.delimiterOverride"] !== "") {
+                $this->delim = $this->config["database.delimiterOverride"];
+                if (strlen($this->delim) === 1) {
+                    $this->delim .= $this->delim;
+                }
+            } else {
+                switch ($this->config["database.connection"]["driver"]) {
+                case Database::DB_MYSQL:
+                    $this->delim = "``";
+                    break;
+                case Database::DB_SQLSRV:
+                    $this->delim = "[]";
+                    break;
+                default:
+                    $this->delim = "\"\"";
+                }
+            }
+        }
+        $this->qBuilder->setDelim($this->delim);
     }
 
     /**

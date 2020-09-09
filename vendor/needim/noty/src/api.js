@@ -84,6 +84,7 @@ export let Defaults = {
     afterShow: null,
     onClose: null,
     afterClose: null,
+    onClick: null,
     onHover: null,
     onTemplate: null
   },
@@ -95,7 +96,8 @@ export let Defaults = {
   titleCount: {
     conditions: []
   },
-  modal: false
+  modal: false,
+  visibilityControl: false
 }
 
 /**
@@ -307,6 +309,8 @@ function findOrCreateContainer (ref) {
   if (!ref.layoutDom) {
     ref.layoutDom = document.createElement('div')
     ref.layoutDom.setAttribute('id', layoutID)
+    ref.layoutDom.setAttribute('role', 'alert')
+    ref.layoutDom.setAttribute('aria-live', 'polite')
     Utils.addClass(ref.layoutDom, 'noty_layout')
     document.querySelector('body').appendChild(ref.layoutDom)
   }

@@ -10,7 +10,7 @@
     ],
     "require": {
         "php":  ">=7.0.0",
-        "slaxweb/logger": "dev-master",
+        "slaxweb/logger": "~0.5",
         "slaxweb/getset": "~0.1"
     },
     "require-dev": {
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "0.6.x-dev"
+            "dev-develop": "0.7.x-dev"
         }
     }
 }

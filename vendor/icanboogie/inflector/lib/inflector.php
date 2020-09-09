@@ -75,7 +75,7 @@ class Inflector
 	 *
 	 * @param Inflections $inflections
 	 */
-	protected function __construct(Inflections $inflections = null)
+	public function __construct(Inflections $inflections = null)
 	{
 		$this->inflections = $inflections ?: new Inflections;
 	}
@@ -161,7 +161,7 @@ class Inflector
 	 * $this->pluralize('children');   // "child"
 	 * $this->pluralize('sheep');      // "sheep"
 	 * $this->pluralize('words');      // "words"
-	 * $this->pluralize('CamelChild'); // "CamelChild"
+	 * $this->pluralize('CamelChild'); // "CamelChildren"
 	 * </pre>
 	 *
 	 * @param string $word
@@ -178,7 +178,7 @@ class Inflector
 	 *
 	 * <pre>
 	 * $this->singularize('posts');         // "post"
-	 * $this->singularize('childred');      // "child"
+	 * $this->singularize('children');      // "child"
 	 * $this->singularize('sheep');         // "sheep"
 	 * $this->singularize('word');          // "word"
 	 * $this->singularize('CamelChildren'); // "CamelChild"
@@ -291,7 +291,7 @@ class Inflector
 
 		$word = preg_replace('/([[:upper:]\d]+)([[:upper:]][[:lower:]])/u', '\1_\2', $word);
 		$word = preg_replace('/([[:lower:]\d])([[:upper:]])/u','\1_\2', $word);
-		$word = strtr($word, "-", "_");
+		$word = preg_replace('/\-+|\s+/', '_', $word);
 		$word = downcase($word);
 
 		return $word;
@@ -457,5 +457,27 @@ class Inflector
 	public function ordinalize($number)
 	{
 		return $number . $this->ordinal($number);
+	}
+
+	/**
+	 * Returns true if the word is uncountable, false otherwise.
+	 *
+	 * <pre>
+	 * $this->is_uncountable('advice');    // true
+	 * $this->is_uncountable('weather');   // true
+	 * $this->is_uncountable('cat');       // false
+	 * </pre>
+	 *
+	 * @param string $word
+	 *
+	 * @return bool
+	 */
+	public function is_uncountable($word)
+	{
+		$rc = (string) $word;
+
+		return $rc
+			&& preg_match('/\b[[:word:]]+\Z/u', downcase($rc), $matches)
+			&& isset($this->inflections->uncountables[$matches[0]]);
 	}
 }

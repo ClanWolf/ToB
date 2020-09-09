@@ -10,12 +10,12 @@
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 namespace SlaxWeb\DatabasePDO;
 
-use Slaxweb\Database\Exception\RowNotFoundException;
-use Slaxweb\Database\Exception\ColumnNotFoundException;
+use SlaxWeb\Database\Exception\RowNotFoundException;
+use SlaxWeb\Database\Exception\ColumnNotFoundException;
 use SlaxWeb\Database\Interfaces\Result as ResultInterface;
 
 class Result implements ResultInterface
@@ -69,11 +69,18 @@ class Result implements ResultInterface
      */
     public function __get(string $name)
     {
-        if (isset($this->_rawData[$this->_currRow]) === false) {
-            throw new RowNotFoundException("The requested row does not exist in the current result set.");
+        if (isset($this->_rawData[$this->_currRow]) === false
+            || is_object($this->_rawData[$this->_currRow]) === false
+        ) {
+            throw new RowNotFoundException(
+                "The requested row does not exist in the current result set, or is "
+                . "not an object."
+            );
         }
-        if (isset($this->_rawData[$this->_currRow]->{$name}) === false) {
-            throw new ColumnNotFoundException("The requested column does not exist in the current result set.");
+        if (property_exists($this->_rawData[$this->_currRow], $name) === false) {
+            throw new ColumnNotFoundException(
+                "The requested column does not exist in the current result set."
+            );
         }
         return $this->_rawData[$this->_currRow]->{$name};
     }

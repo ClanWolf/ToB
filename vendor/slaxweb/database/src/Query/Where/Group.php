@@ -14,7 +14,7 @@ use SlaxWeb\Database\Query\Builder;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 class Group
 {
@@ -52,6 +52,13 @@ class Group
      * @var string
      */
     protected $delim = "";
+
+    /**
+     * Built predicates
+     *
+     * @var string
+     */
+    protected $built = "";
 
     /**
      * Class constructor
@@ -108,23 +115,26 @@ class Group
      */
     public function convert(string $table = ""): string
     {
-        if (count($this->list) < 1) {
-            return "";
+        if ($this->built !== "" || count($this->list) < 1) {
+            return $this->built;
         }
 
         if ($table === "") {
             $table = $this->table;
         }
 
-        $where = " {$this->opr} (";
         $first = array_shift($this->list);
-        $where .= $first["predicate"]->convert($table);
+        $where = $first["predicate"]->convert($table);
         $this->params = array_merge($this->params, $first["predicate"]->getParams());
+
         foreach ($this->list as $predicate) {
             $where .= " {$predicate["opr"]} " . $predicate["predicate"]->convert($table);
             $this->params = array_merge($this->params, $predicate["predicate"]->getParams());
         }
-        return "{$where})";
+        if (!$first["predicate"] instanceof Group) {
+            $where = " {$this->opr} ({$where})";
+        }
+        return $this->built = $where;
     }
 
     /**
@@ -156,7 +166,7 @@ class Group
         $this->list[] = [
             "opr"       =>  $cOpr,
             "predicate" =>  (new Predicate)
-                ->setColumn($this->delim . $column . $this->delim)
+                ->setColumn($this->delim[0] . $column . $this->delim[1])
                 ->setValue($value)
                 ->setOperator($lOpr)
         ];
@@ -232,7 +242,7 @@ class Group
         $this->list[] = [
             "opr"       =>  $cOpr,
             "predicate" =>  (new Predicate)
-                ->setColumn($this->delim . $column . $this->delim)
+                ->setColumn($this->delim[0] . $column . $this->delim[1])
                 ->setValue($nested($builder), false, $builder->getParams())
                 ->setOperator($lOpr)
         ];

@@ -3,6 +3,7 @@ namespace SlaxWeb\Database\Query;
 
 use SlaxWeb\Database\Query\Where\Group;
 use SlaxWeb\Database\Query\Where\Predicate;
+use Slaxweb\Database\Exception\QueryBuilderException;
 
 /**
  * Query Builder
@@ -15,7 +16,7 @@ use SlaxWeb\Database\Query\Where\Predicate;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 class Builder
 {
@@ -124,7 +125,7 @@ class Builder
      */
     public function table(string $table): self
     {
-        $this->table = $this->delim . $table . $this->delim;
+        $this->table = $this->delim[0] . $table . $this->delim[1];
         $this->predicates->table($this->table);
         return $this;
     }
@@ -176,23 +177,32 @@ class Builder
      *
      * Create the insert query based on the array of data. It prepares the query
      * for parameter binding, and stores the parameter values in the local parameters
-     * property which can be retrieved with 'getParams' method call.
+     * property which can be retrieved with 'getParams' method call. Throws an exception
+     * if the table name has not been set prior to calling this method.
      *
      * @param array $data Data to be inserted
      * @return string
+     *
+     * @throws \SlaxWeb\Database\Exception\QueryBuilderException
      */
     public function insert(array $data): string
     {
-        return "INSERT INTO {$this->table} ({$this->delim}"
-            . implode("{$this->delim},{$this->delim}", array_keys($data))
-            . "{$this->delim}) VALUES ("
+        if ($this->table === "") {
+            throw new QueryBuilderException(
+                "No table name has been set, can not construct SQL statement!"
+            );
+        }
+
+        return "INSERT INTO {$this->table} ({$this->delim[0]}"
+            . implode("{$this->delim[1]},{$this->delim[0]}", array_keys($data))
+            . "{$this->delim[1]}) VALUES ("
             . implode(",", array_map(function($value) {
                 if (is_array($value) && isset($value["func"])) {
                     return $value["func"];
                 }
                 $this->params[] = $value;
                 return "?";
-            }, $data, array_keys($data)))
+            }, $data))
             . ")";
     }
 
@@ -205,13 +215,22 @@ class Builder
      * item is another array, it needs to hold the "func" and "col" keys at least,
      * defining the SQL DML function, as well as the column name. A third item with
      * the key name "as" can be added, and this name will be used in the "AS" statement
-     * in the SQL DML for that column.
+     * in the SQL DML for that column. Throws an exception if the table name has
+     * not been set prior to calling this method.
      *
      * @param array $cols Column definitions
      * @return string
+     *
+     * @throws \SlaxWeb\Database\Exception\QueryBuilderException
      */
     public function select(array $cols): string
     {
+        if ($this->table === "") {
+            throw new QueryBuilderException(
+                "No table name has been set, can not construct SQL statement!"
+            );
+        }
+
         $query = "SELECT " . $this->buildColList($cols, $this->table);
 
         // create join statements
@@ -222,13 +241,8 @@ class Builder
         $query .= " FROM {$this->table} {$join["statement"]}WHERE 1=1" . $this->predicates->convert();
         $this->params = $this->predicates->getParams();
 
-        if ($this->groupCols !== []) {
-            $query .= " GROUP BY " . implode(",", $this->groupCols);
-        }
-
-        if ($this->orderCols !== []) {
-            $query .= " ORDER BY " . implode(",", $this->orderCols);
-        }
+        $query .= $this->getGroupBy();
+        $query .= $this->getOrderBy();
 
         if ($this->limit > 0) {
             $query .= " LIMIT {$this->limit}" . ($this->offset > 0 ? " OFFSET {$this->offset}" : "");
@@ -242,16 +256,25 @@ class Builder
      *
      * Create the update statement with the where predicates. As input it takes an
      * array of columns as array item keys and their new values as the array item
-     * values.
+     * values. Throws an exception if the table name has not been set prior to calling
+     * this method.
      *
      * @param array $cols Array of column names and their new values
      * @return string
+     *
+     * @throws \SlaxWeb\Database\Exception\QueryBuilderException
      */
     public function update(array $cols): string
     {
+        if ($this->table === "") {
+            throw new QueryBuilderException(
+                "No table name has been set, can not construct SQL statement!"
+            );
+        }
+
         $query = "UPDATE {$this->table} SET "
             . implode(",", array_map(function($value, $column) {
-                $col = "{$this->table}.{$this->delim}{$column}{$this->delim} = ";
+                $col = "{$this->table}.{$this->delim[0]}{$column}{$this->delim[1]} = ";
                 if (is_array($value) && isset($value["func"])) {
                     return $col . $value["func"];
                 }
@@ -267,12 +290,21 @@ class Builder
     /**
      * Delete
      *
-     * Create delete statement with the where predicates.
+     * Create delete statement with the where predicates. Throws an exception if
+     * the table name has not been set prior to calling this method.
      *
      * @return string
+     *
+     * @throws \SlaxWeb\Database\Exception\QueryBuilderException
      */
     public function delete(): string
     {
+        if ($this->table === "") {
+            throw new QueryBuilderException(
+                "No table name has been set, can not construct SQL statement!"
+            );
+        }
+
         $query = "DELETE FROM {$this->table} WHERE 1=1" . $this->predicates->convert();
         $this->params = $this->predicates->getParams();
         return $query;
@@ -394,7 +426,7 @@ class Builder
     public function join(string $table, string $type = "INNER JOIN"): self
     {
         $this->joins[] = [
-            "table"     =>  $this->delim . $table . $this->delim,
+            "table"     =>  $this->delim[0] . $table . $this->delim[1],
             "type"      =>  $type,
             "cond"      =>  [],
             "colList"   =>  []
@@ -414,7 +446,7 @@ class Builder
      * @param string $lOpr Logical operator for multiple JOIN conditions
      * @return self
      *
-     * @exceptions \SlaxWeb\Database\Exception\NoJoinTableException
+     * @throws \SlaxWeb\Database\Exception\NoJoinTableException
      */
     public function joinCond(string $primKey, string $forKey, string $cOpr = Predicate::OPR_EQUAL, $lOpr = "AND"): self
     {
@@ -459,7 +491,7 @@ class Builder
      * @param array $cols Column list
      * @return self
      *
-     * @exceptions \SlaxWeb\Database\Exception\NoJoinTableException
+     * @throws \SlaxWeb\Database\Exception\NoJoinTableException
      */
     public function joinCols(array $cols): self
     {
@@ -484,7 +516,7 @@ class Builder
      */
     public function groupBy(string $col): self
     {
-        $this->groupCols[] = $this->table . "." . $this->delim . $col . $this->delim;
+        $this->groupCols[] = $col;
         return $this;
     }
 
@@ -497,14 +529,23 @@ class Builder
      * @param string $direction Direction of order, default self::ORDER_ASC
      * @param string $func SQL function to use ontop of the column, default string("")
      * @return self
+     *
+     * @throws \SlaxWeb\Database\Exception\QueryBuilderException
      */
     public function orderBy(string $col, string $direction = self::ORDER_ASC, string $func = ""): self
     {
-        $orderData = "{$this->table}.{$this->delim}{$col}{$this->delim}";
-        if ($func !== "") {
-            $orderData = "{$func}({$orderData})";
+        if ($col === "" && $func === "") {
+            throw new QueryBuilderException(
+                "Either the column or the function parameters need to be set for"
+                . " 'orderBy'."
+            );
         }
-        $this->orderCols[] = "{$orderData} {$direction}";
+
+        $this->orderCols[] = [
+            "col"       =>  $col,
+            "direction" =>  $direction,
+            "func"      =>  $func
+        ];
         return $this;
     }
 
@@ -543,13 +584,13 @@ class Builder
             // create "table"."column"
             if (is_array($name)) {
                 $colList .= strtoupper($name["func"] ?? "");
-                $col = $table . "." . $this->delim . $name["col"] . $this->delim;
+                $col = $table . "." . $this->delim[0] . $name["col"] . $this->delim[1];
                 $colList .= "({$col})";
                 if (isset($name["as"])) {
                     $colList .= " AS {$name["as"]},";
                 }
             } else {
-                $name = $table . "." . $this->delim . $name . $this->delim;
+                $name = $table . "." . $this->delim[0] . $name . $this->delim[1];
                 $colList .= "{$name},";
             }
         }
@@ -565,6 +606,8 @@ class Builder
      * separated list of columns to be included in the SELECT statement.
      *
      * @return array
+     *
+     * @throws \SlaxWeb\Database\Exception\NoJoinConditionException
      */
     protected function getJoinData(): array
     {
@@ -583,9 +626,9 @@ class Builder
                 }
                 $joinData["statement"] .= " ON (1=1";
                 foreach ($join["cond"] as $cond) {
-                    $joinData["statement"] .= " {$cond["lOpr"]} {$this->table}.{$this->delim}"
-                        . "{$cond["primKey"]}{$this->delim} {$cond["cOpr"]} {$join["table"]}."
-                        . "{$this->delim}{$cond["forKey"]}{$this->delim}";
+                    $joinData["statement"] .= " {$cond["lOpr"]} {$this->table}.{$this->delim[0]}"
+                        . "{$cond["primKey"]}{$this->delim[1]} {$cond["cOpr"]} {$join["table"]}."
+                        . "{$this->delim[0]}{$cond["forKey"]}{$this->delim[1]}";
                 }
                 $joinData["statement"] .= ") ";
             }
@@ -594,5 +637,43 @@ class Builder
             $joinData["colList"] .= $this->buildColList($join["colList"], $join["table"]);
         }
         return $joinData;
+    }
+
+    /**
+     * Get Group By Statement
+     *
+     * Construct the group by statement if any data has been added to the group
+     * by internal property by the 'groupBy' method.
+     *
+     * @return string
+     */
+    protected function getGroupBy(): string
+    {
+        $groupBy = "";
+        foreach ($this->groupCols as $col) {
+            $groupBy .= $this->table . "." . $this->delim[0] . $col . $this->delim[1] . ",";
+        }
+        return $groupBy !== "" ? " GROUP BY " . rtrim($groupBy, ",") : "";
+    }
+
+    /**
+     * Get Order By Statement
+     *
+     * Construct the order by statement if any data has been added to the order
+     * by internal property by the 'orderBy' method.
+     *
+     * @return string
+     */
+    protected function getOrderBy(): string
+    {
+        $orderBy = "";
+        foreach ($this->orderCols as $data) {
+            $orderData = "{$this->table}.{$this->delim[0]}{$data["col"]}{$this->delim[1]}";
+            if ($data["func"] !== "") {
+                $orderData = "{$data["func"]}({$orderData})";
+            }
+            $orderBy .= "{$orderData} {$data["direction"]},";
+        }
+        return $orderBy !== "" ? " ORDER BY " . rtrim($orderBy, ",") : "";
     }
 }

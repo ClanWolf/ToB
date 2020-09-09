@@ -14,7 +14,7 @@
     ],
     "subcomponents": {
         "list": {
-            "view-twig": "~0.4"
+            "view-twig": "~0.5"
         },
         "required": false,
         "multi": false

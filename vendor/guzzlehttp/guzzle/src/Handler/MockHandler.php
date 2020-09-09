@@ -14,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class MockHandler implements \Countable
 {
-    private $queue;
+    private $queue = [];
     private $lastRequest;
     private $lastOptions;
     private $onFulfilled;
@@ -66,7 +66,7 @@ class MockHandler implements \Countable
             throw new \OutOfBoundsException('Mock queue is empty');
         }
 
-        if (isset($options['delay'])) {
+        if (isset($options['delay']) && is_numeric($options['delay'])) {
             usleep($options['delay'] * 1000);
         }
 
@@ -91,7 +91,7 @@ class MockHandler implements \Countable
         }
 
         $response = $response instanceof \Exception
-            ? new RejectedPromise($response)
+            ? \GuzzleHttp\Promise\rejection_for($response)
             : \GuzzleHttp\Promise\promise_for($response);
 
         return $response->then(
@@ -120,7 +120,7 @@ class MockHandler implements \Countable
                 if ($this->onRejected) {
                     call_user_func($this->onRejected, $reason);
                 }
-                return new RejectedPromise($reason);
+                return \GuzzleHttp\Promise\rejection_for($reason);
             }
         );
     }
@@ -175,6 +175,11 @@ class MockHandler implements \Countable
         return count($this->queue);
     }
 
+    public function reset()
+    {
+        $this->queue = [];
+    }
+
     private function invokeStats(
         RequestInterface $request,
         array $options,
@@ -182,7 +187,8 @@ class MockHandler implements \Countable
         $reason = null
     ) {
         if (isset($options['on_stats'])) {
-            $stats = new TransferStats($request, $response, 0, $reason);
+            $transferTime = isset($options['transfer_time']) ? $options['transfer_time'] : 0;
+            $stats = new TransferStats($request, $response, $transferTime, $reason);
             call_user_func($options['on_stats'], $stats);
         }
     }
