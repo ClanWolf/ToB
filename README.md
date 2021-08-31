@@ -35,4 +35,6 @@ This page contains the opening speech the oathmaster will give prior to an indiv
 
 ---
 
-<a href='https://www.paypal.com/pools/c/8ri2Y8lrl7'>Click here to lend your support to: C3 - Communicate / Command / Control and make a donation!</a>
+If you want to support C3, consider to donate via paypal or become a patreon:
+* [Paypal](https://www.paypal.com/donate?token=SrCxd2l7S3sKbgQWU4jG19vgzbWNN4evLxPOwtuQY8APeglyDVpYcmuIkDm7V5RGPACIB17XN1PuiKhD "Paypal")
+* [Patreon](https://www.patreon.com/ClanWolf "Patreon")
