@@ -1,5 +1,7 @@
 # CoinRitual
 
+<img src="https://img.shields.io/liberapay/receives/WarWolfen.svg?logo=liberapay">
+
 These are the scripts needed for the coin ritual setup used in Trials of Bloodright by Clan Wolf Germany. There is an observer page, an oathmaster page and a server using a websocket to communicate.
 
 # Contains
