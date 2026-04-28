@@ -1,13 +1,15 @@
 <?php
 
+require_once __DIR__ . '/db_credentials.php';
+
 function db(): PDO
 {
 	static $pdo = null;
 	if ($pdo === null) {
-		$host = getenv('DB_HOST') ?: 'db';
-		$name = getenv('DB_NAME') ?: 'cwg';
-		$user = getenv('DB_USER') ?: 'cwg';
-		$pass = getenv('DB_PASS') ?: 'cwg';
+		$host = $DB_HOST ?: 'db';
+		$name = $DB_NAME ?: 'cwg';
+		$user = $DB_USER ?: 'cwg';
+		$pass = $DB_PASS ?: 'cwg';
 		$pdo = new PDO(
 			"mysql:host={$host};dbname={$name};charset=utf8mb4",
 			$user,
