@@ -1,10 +1,13 @@
+<?php
+$lang = require __DIR__ . '/lib/init.php';
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= $lang ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="description" content="ToB - Trial of Bloodright">
 	<meta name="keywords" content="battletech, mechwarrior, clan, wolf, mech, battlemech, madcat, timberwolf, seyla, kerensky, bloodright, tob">
-	<meta http-equiv="content-language" content="en">
+	<meta http-equiv="content-language" content="<?= $lang ?>">
 	<meta name="robots" content="INDEX,FOLLOW">
 
 	<title>Clan Wolf - Trial of Bloodright</title>
@@ -17,13 +20,10 @@
 	<link rel="stylesheet" href="css/stylesheet.css">
 
 	<style>
-		/* Hide chrome that does not apply to the language landing page. */
-		#contentwindow .navigation,
-		#contentwindow .tourneyselector {
-			display: none;
-		}
-		#contentwindow {
-			display: none;
+		.container {
+			height: 100%;
+			margin-bottom: 0px;
+			padding: 25px 0 0 0;
 		}
 	</style>
 
@@ -34,16 +34,11 @@
 <body>
 	<div class="selected_flag">
 		<a href="#">
-			<img name="flag" id="flag" src="img/flag/empty.png" width="30px">
+			<img name="flag" id="flag" src="img/flag/<?= $lang ?>.png" width="30px">
 		</a>
 	</div>
 
-	<div class="galaxy_symbol">
-		<img name="galaxy" src="img/WolfEmpty.png" width="90px">
-	</div>
-
-	<div name="movable" id="1000" class="top_background"></div>
-	<div class="head_structure" id="headstructure"></div>
+	<div class="head_structure" id="headstructure" style="z-index: 20;"></div>
 
 	<div class="mech_left">
 		<img src="img/timberwolf-left.png" width="330px">
@@ -53,14 +48,23 @@
 	</div>
 
 	<div id="contentwindow" class="content">
-		<div id="typedtext"></div>
-
-		<div class="fastforwardbutton">
-			<a href="/home" style="font-family: 'Arial', sans-serif; font: normal 28px 'Arial';">&gt;&gt;&gt;</a>
+		<div class="navigation">
+			<a href="fame.php?lang=<?= $lang ?>"><?= t('9802', $lang) ?></a>
+			&nbsp;&nbsp;|&nbsp;&nbsp;
+			<a href="tables.php?lang=<?= $lang ?>"><?= t('3020', $lang) ?></a>
+			&nbsp;&nbsp;|&nbsp;&nbsp;
+			<a href="rules.php?lang=<?= $lang ?>"><?= t('3030', $lang) ?></a>
+			&nbsp;<br><hr>
 		</div>
 
-		<div class="hudanimation">
-			<img src="img/hud.gif" width="300px">
+		<div class="container">
+			<iframe src="http://cwg.challonge.com/ToB_CW_B_201704/module?theme=3821&multiplier=1.0&match_width_multiplier=0.8&show_final_result=0"
+				width="100%"
+				height="95%"
+				frameborder="0"
+				scrolling="auto"
+				allowtransparency="true">
+			</iframe>
 		</div>
 
 		<div class="hudcenteranimation">
@@ -83,36 +87,17 @@
 		</div>
 	</div>
 
-	<div name="movable" id="1010" class="fire">
-		<img src="img/fire.gif" width="90px" height="180px">
-	</div>
-
-	<div name="movable" id="1020" class="content_language_selector">
+	<div class="content_language_selector" style="top: -1px; z-index: 0;">
 		<table style="width: 300px; border-collapse: collapse; border-spacing: 0px; border: 0px; margin: 0px; padding: 0px;">
 			<tr>
 				<td style="padding: 0px; text-align: right;" width="100px">
-					<a class="tooltip lang_selector" data-langstring="en" href="#">
-						<span class="tooltiptext">Enter</span>
-						<img src="img/selector_left.png" width="100px" height="550px"
-							onmouseover="changeImage('galaxy','galaxyImage_Alpha');"
-							onmouseout="changeImage('galaxy','galaxyImage_Empty');">
-					</a>
+					<img src="img/selector_left.png" width="100px" height="550px">
 				</td>
 				<td style="padding: 0px; text-align: center;" width="100px">
-					<a class="tooltip lang_selector" data-langstring="de" href="#">
-						<span class="tooltiptext">Betreten</span>
-						<img src="img/selector_center.png" width="100px" height="550px"
-							onmouseover="changeImage('galaxy','galaxyImage_Gamma');"
-							onmouseout="changeImage('galaxy','galaxyImage_Empty');">
-					</a>
+					<img src="img/selector_center.png" width="100px" height="550px">
 				</td>
 				<td style="padding: 0px; text-align: left;" width="100px">
-					<a class="tooltip lang_selector" data-langstring="ru" href="#">
-						<span class="tooltiptext">войти</span>
-						<img src="img/selector_right.png" width="100px" height="550px"
-							onmouseover="changeImage('galaxy','galaxyImage_Beta');"
-							onmouseout="changeImage('galaxy','galaxyImage_Empty');">
-					</a>
+					<img src="img/selector_right.png" width="100px" height="550px">
 				</td>
 			</tr>
 		</table>
@@ -121,10 +106,8 @@
 	<div class="bottom">
 		<script src="js/script.js"></script>
 		<script src="js/cookies.js"></script>
-		<script src="js/typewriter.js"></script>
 		<script src="js/howler.min.js"></script>
 		<script src="js/sound.js"></script>
-		<script src="js/langSelector.js"></script>
 
 		<script>
 			if (sound === "on") {
