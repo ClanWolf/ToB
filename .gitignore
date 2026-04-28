@@ -1,2 +1,4 @@
 # IntelliJ Idea project files
 .idea
+
+lib/db_credentials.php
